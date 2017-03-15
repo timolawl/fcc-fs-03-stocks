@@ -1,0 +1,39 @@
+$primary-color: #024059; // darkteal //#011C40; // darkblue #add8e6; // lightblue
+$secondary-color: #999; // gray #808080; // gray
+$highlight-color: #F29D35; // lamplight #f15a29; // was orange
+$background-color: #011C40; // darkblue
+
+// z-index values:
+/*
+$base-layer: 1;
+$mainbox-layer: 10;
+$overlay-layer: 100;
+$modal-layer: 1000;
+*/
+
+$zindex: (
+  modal:    9000,
+  overlay:  8000,
+  mainbox:  7000
+);
+
+/********************************************************/
+// helpers
+.visibility--show {
+  visibility: visible !important;
+}
+
+.visibility--hide {
+  visibility: hidden !important;
+}
+
+.display--show {
+  display: initial !important;
+}
+
+.display--hide {
+  display: none !important;
+}
+
+
+/********************************************************/
