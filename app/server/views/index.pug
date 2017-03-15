@@ -1,4 +1,9 @@
 include /includes/header.pug
 section.stocks
-  button(type='button') press me
+  form
+    button.test-urls(type='button') test urls
+    input.stock-ticker(type='text' placeholder='type stock ticker' pattern='^[A-Za-z\\.\\- ]{1,7}$')
+    button.submit-btn(type='submit') submit
+    input.delete-stock-ticker(type='text' placeholder='type stock ticker' pattern='^[A-Za-z\\.\\- ]{1,7}$')
+    button.delete-btn(type='submit') delete
 include /includes/footer.pug
