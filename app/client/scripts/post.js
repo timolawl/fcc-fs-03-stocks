@@ -67,20 +67,27 @@ window.onload = function () {
       $.get(historicalURLs[index], function (data) {
         let relevantData = data.split(/\r\n|\n/).sort().map(row => {
           let items = row.split(',');
+
           return [Date.parse(items[0]), parseFloat((+items[4]).toFixed(2))]; // date and stock closing value
         });
+        /*
+        .filter(entry => !isNaN(entry[0]) && entry[0].length > 0 && !isNaN(entry[1]) && entry[1].length > 0);
+        */
 
         
-        let days = relevantData.filter((row, index) {
-          return row && index !== 0;
+        let days = relevantData.filter((row, i) => {
+          return (row[0] && row[1] && (i !== 0));
         });
+        
+
+        console.log(days);
 
         seriesOptions[index] = {
           name: name,
           data: days
         };
 
-        // console.log(relevantData);
+        // console.log(days);
 
         seriesCounter += 1;
 
@@ -108,6 +115,12 @@ function createChart (seriesOptions) {
     rangeSelector: {
       selected: 4
     },
+    /*
+    xAxis: {
+      min: new Date('2000/10/22').getTime(),
+      max: new Date('2010/10/22').getTime(),
+    },
+    */
     yAxis: {
       labels: {
         formatter: function () {
