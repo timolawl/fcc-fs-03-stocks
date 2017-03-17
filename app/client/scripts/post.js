@@ -78,8 +78,8 @@ window.onload = function () {
     let nameURLs = names.map(stockTicker => 
       `http://autoc.finance.yahoo.com/autoc?query=${stockTicker.toLowerCase()}&region=1&lang=en`);
 
-    console.log(historicalURLs);
-    console.log(nameURLs);
+  //  console.log(historicalURLs);
+  //  console.log(nameURLs);
 
     //retrieveData(historicalURLs, nameURLs);
     
@@ -95,7 +95,8 @@ window.onload = function () {
         };
         seriesCounter += 1;
 
-        generateStockUIElement(name, sessionStoredStock.companyName, index);
+        console.log('generating UI for: ' + sessionStoredStock.company);
+        generateStockUIElement(name, sessionStoredStock.company, index);
 
         if (seriesCounter === names.length) {
           // actual repaint
@@ -107,19 +108,23 @@ window.onload = function () {
       else {
         let companyName = '';
         let today = new Date();
-        let sessionData;
+        let sessionData, days;
 
         
 
         // grab the full name of the company
-        $.get(nameURLs[index])
-        .done(function (data) {
+        let promise1 = $.get(nameURLs[index])
+        .then(function (data) {
          // console.log(data);
           companyName = data.ResultSet.Result[0].name;
-          generateStockUIElement(name, companyName, index);
-        })
+          
+          console.log('generating UI from ajax for: ' + companyName);
+          console.log('data: ' + data.ResultSet.Result[0].name);
+          generateStockUIElement(name, companyName, index)
+        });
 
-        .done(
+
+        let promise2 = 
 
           // grab historical stock data of the company
           $.get(historicalURLs[index], function (data) {
@@ -130,20 +135,22 @@ window.onload = function () {
               return [Date.parse(items[0]), parseFloat((+items[4]).toFixed(2))]; 
             });
             
-            let days = relevantData.filter((row, i) => {
+            days = relevantData.filter((row, i) => {
               return row[0] && i !== 0; // remove title rows and non-content rows
             });
-            
+          });
+
+
+        Promise.all([promise1, promise2])
+          .then(() => {
 
             // will also need to save the date too and if the time difference is less than a day,
             // do not try to grab data again?
-            sessionData = { stock: name, companyName: companyName, data: days, lastUpdated: today }
-         //   console.log(sessionData);
+            sessionData = { stock: name, company: companyName, data: days, lastUpdated: today };
+            console.log('session data for: ' + name + ' ' + companyName);
+            console.log(sessionData);
 
             sessionStorage.setItem(name, JSON.stringify(sessionData));
-
-          //  let test = sessionStorage.getItem(name);
-          //  console.log(JSON.parse(test));
 
             seriesOptions[index] = {
               name: name,
@@ -156,8 +163,9 @@ window.onload = function () {
                 // actual repaint
                 createChart(seriesOptions);
               }
-          })
-        );
+          });
+          
+    
       }
 
       
@@ -242,8 +250,8 @@ function checkLastUpdate (date) {
 function generateStockUIElement (stockName, companyName, index) {
 
   let highchartColors = Highcharts.getOptions().colors;
-  console.log(highchartColors);
-  console.log(index);
+ // console.log(highchartColors);
+ // console.log(index);
 
   console.log('color for ' + stockName + ': ' + highchartColors[index]);
   //let fragment = document.createDocumentFragment();
