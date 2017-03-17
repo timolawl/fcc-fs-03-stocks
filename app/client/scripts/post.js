@@ -12,6 +12,13 @@ jQuery.ajaxPrefilter(function(options) {
 
 window.onload = function () {
 
+  socket.on('error message', function (data) {
+    if (data.display) {
+      document.querySelector('.error-message').classList.remove('visibility--hide');
+    }
+    else document.querySelector('.error-message').classList.add('visibility--hide');
+  });
+
   // initialize chart here
   socket.emit('request tickers', {});
   
@@ -23,7 +30,9 @@ window.onload = function () {
 
   // add stock
   document.querySelector('.submit-btn').addEventListener('click', e => {
-    e.preventDefault();
+    e.preventDefault(); // this is why the form submission goes through anyway even with the pattern field
+    // Use the title attribute to describe the pattern to help the user.
+    console.log(document.querySelector('.stock-ticker').value);
     if (document.querySelector('.stock-ticker').value) { 
       // may want to sanitize this before passing it along
       socket.emit('add ticker', { ticker: document.querySelector('.stock-ticker').value.toUpperCase() });
@@ -257,6 +266,7 @@ function generateStockUIElement (stockName, companyName, index) {
   //let fragment = document.createDocumentFragment();
   let stock = document.createElement('div');
   stock.classList.add('stock');
+ // stock.classList.add(stockName);
   stock.style.background = highchartColors[index];
   document.querySelector('.stocks').appendChild(stock);
   let ticker = document.createElement('div');

@@ -3,7 +3,15 @@
 const mongoose = require('mongoose');
 
 const stockSchema = new mongoose.Schema({
-  stockTicker: { type: String, required: true }
+  stockTicker: { type: String,
+                 required: [true, 'Stock ticker required'],
+                 validate: {
+                   validator: function (v) {
+                     return /^[A-Za-z\\.\\- ]{1,7}$/.test(v);
+                   },
+                   message: '{VALUE} is not a valid stock ticker!'
+                 } 
+               }
 });
 
 stockSchema.statics.findOrCreate = function (stock, cb) {
