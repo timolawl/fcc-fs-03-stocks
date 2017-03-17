@@ -86,13 +86,17 @@ module.exports = io => {
           console.log(json.ResultSet.Result[0].name);
         });
       */
-
+/*
       fetch(historicalURL, { method: 'GET' })
         .then(res => res.text())
         .then(csv => {
           let rows = csv.split(/\r\n|\n/);
           console.log(rows);
-        })
+        });
+        */
+
+      //socket.emit('update processed', {});
+      io.emit('update processed', {}); // emit to all users including sender
     });
 
     socket.on('remove ticker', function (data) {
@@ -100,7 +104,8 @@ module.exports = io => {
       Stock.deleteOne({ stockTicker: data.ticker }, (err, result) => {
         console.log(result);
       });
-      
+      //socket.emit('update processed', {});
+      io.emit('update processed', {}); // emit to all users including sender
     });
 
     socket.on('request tickers', function (data) {
@@ -117,6 +122,5 @@ module.exports = io => {
         }
       });
     });
-
   });
 };
