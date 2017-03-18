@@ -31,9 +31,6 @@ window.onload = function () {
   // add stock
   document.querySelector('.btn--submit').addEventListener('click', e => {
     e.preventDefault(); // this is why the form submission goes through anyway even with the pattern field
-    // Use the title attribute to describe the pattern to help the user.
-    
-    //console.log(document.querySelector('.form__input--add').value);
     if (document.querySelector('.form__input--add').value) { 
       // may want to sanitize this before passing it along
       socket.emit('add ticker', { ticker: document.querySelector('.form__input--add').value.toUpperCase() });
@@ -63,12 +60,10 @@ window.onload = function () {
       stocksNode.removeChild(stocksNode.firstChild);
     }
 
-
-    // given the stock ticker data
-    console.log('Logging data: ' + data.stockTickers);
-
     // seems horribly inefficient to redo all the AJAX calls, redraws/repaints after each addition/subtraction of a stock ticker, but this seems the price to pay for not saving the stock data beyond the name to the db.
     // it is possible to use local storage to save the previous data and retrieve it there instead of making repeated AJAX calls
+    
+    // storing retrieved data in session storage:
 
     // following the highcharts example:
     let seriesOptions = [],
@@ -92,16 +87,10 @@ window.onload = function () {
     let nameURLs = names.map(stockTicker => 
       `http://autoc.finance.yahoo.com/autoc?query=${stockTicker.toLowerCase()}&region=1&lang=en`);
 
-  //  console.log(historicalURLs);
-  //  console.log(nameURLs);
-
-    //retrieveData(historicalURLs, nameURLs);
-    
     names.forEach((name, index) => {
       // check if these items are in session storage, and if the dates match.
       // if so, retrieve from session storage:
       if (sessionStorage.getItem(name) && checkLastUpdate((JSON.parse(sessionStorage.getItem(name))).lastUpdated)) {
-        console.log('loading ' + name + ' from session storage');
         let sessionStoredStock = JSON.parse(sessionStorage.getItem(name));
         seriesOptions[index] = {
           name: name,
@@ -109,7 +98,6 @@ window.onload = function () {
         };
         seriesCounter += 1;
 
-        console.log('generating UI for: ' + sessionStoredStock.company);
         generateStockUIElement(name, sessionStoredStock.company, index);
 
         if (seriesCounter === names.length) {
@@ -124,25 +112,17 @@ window.onload = function () {
         let today = new Date();
         let sessionData, days;
 
-        
-
         // grab the full name of the company
         let promise1 = $.get(nameURLs[index])
         .then(function (data) {
-         // console.log(data);
           companyName = data.ResultSet.Result[0].name;
-          
-          console.log('generating UI from ajax for: ' + companyName);
-          console.log('data: ' + data.ResultSet.Result[0].name);
           generateStockUIElement(name, companyName, index)
         });
 
 
         let promise2 = 
-
           // grab historical stock data of the company
           $.get(historicalURLs[index], function (data) {
-            console.log('ajax request for: ' + name);
             let relevantData = data.split(/\r\n|\n/).sort().map(row => {
               let items = row.split(',');
               // date and stock closing value
@@ -157,7 +137,6 @@ window.onload = function () {
 
         Promise.all([promise1, promise2])
           .then(() => {
-
             // will also need to save the date too and if the time difference is less than a day,
             // do not try to grab data again?
             sessionData = { stock: name, company: companyName, data: days, lastUpdated: today };
@@ -178,33 +157,9 @@ window.onload = function () {
                 createChart(seriesOptions);
               }
           });
-          
-    
       }
-
-      
-      
-
-
-      // if not, retrieve data first, process, then store in session storage
-      // overwriting any old stock ticker dates
-            
-      // check sessions storage if the name exists. If so, then retrieve the name there
-      
-      // else, retrieve the name from the name URL and save it to session storage
-
-    });
-
-    
-   
+    });    
   });
-
-
-  // load new stocks
-  socket.on('load stock', function (data) {
-    // check to see if the stock is already listed
-  });
-
 };
 
 // http://www.highcharts.com/stock/demo/compare
@@ -213,12 +168,6 @@ function createChart (seriesOptions) {
     rangeSelector: {
       selected: 4
     },
-    /*
-    xAxis: {
-      min: new Date('2000/10/22').getTime(),
-      max: new Date('2010/10/22').getTime(),
-    },
-    */
     yAxis: {
       labels: {
         formatter: function () {
@@ -246,14 +195,11 @@ function createChart (seriesOptions) {
     },
     series: seriesOptions
   });
-
-//  console.log(Highcharts.getOptions().colors);
 }
 
 function checkLastUpdate (date) {
   let sameDate = false;
   let lastUpdated = new Date(date);
- // console.log(testDate.getUTCDate());
   let now = new Date();
   if (lastUpdated.getUTCDate() === now.getUTCDate() && lastUpdated.getUTCMonth() === now.getUTCMonth() && lastUpdated.getUTCFullYear() === now.getUTCFullYear()) {
     sameDate = true;
@@ -264,8 +210,6 @@ function checkLastUpdate (date) {
 function generateStockUIElement (stockName, companyName, index) {
 
   let highchartColors = Highcharts.getOptions().colors;
- // console.log(highchartColors);
- // console.log(index);
 
   if (index % 2 === 0) {
     let newRow = document.createElement('div');
@@ -277,13 +221,8 @@ function generateStockUIElement (stockName, companyName, index) {
   stockWrapper.className = 'wrapper--stock medium-6 large-6 columns';
   document.querySelector('.stocks').lastChild.appendChild(stockWrapper);
 
-
-  console.log('color for ' + stockName + ': ' + highchartColors[index]);
-  //let fragment = document.createDocumentFragment();
   let stock = document.createElement('div');
   stock.className = 'stock';
- // stock.classList.add(stockName);
-  //stock.style.background = highchartColors[index];
   stock.style.border = '1px solid ' + highchartColors[index];
   stock.setAttribute('data-border-color', highchartColors[index]);
   stockWrapper.appendChild(stock);
@@ -295,17 +234,7 @@ function generateStockUIElement (stockName, companyName, index) {
   company.classList.add('stock__company-name');
   company.textContent = companyName;
   stock.appendChild(company);
-  /*
-  let remove = document.createElement('img');
-  remove.src = '/static/img/cross.svg';
-  remove.classList.add('stock__remove');
-  remove.textContent = 'Remove';
-  stock.appendChild(remove);
-  remove.addEventListener('click', e => {
-    socket.emit('remove ticker', { ticker: stockName });
-    e.target.parentNode.parentNode.removeChild(e.target.parentNode);
-  });
-  */
+  
   let remove = document.createElement('button');
   remove.className = 'hollow button alert stock__remove';
   remove.setAttribute('type', 'button');
@@ -319,11 +248,7 @@ function generateStockUIElement (stockName, companyName, index) {
   close.setAttribute('aria-hidden', 'true');
   close.innerHTML = '&times;';
   remove.appendChild(close);
-  /*
-  let icon = document.createElement('i');
-  icon.classList.add('fi-x');
-  close.appendChild(icon);
-  */
+
   remove.addEventListener('click', e => {
     socket.emit('remove ticker', { ticker: stockName });
     e.target.parentNode.parentNode.removeChild(e.target.parentNode);

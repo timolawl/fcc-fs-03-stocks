@@ -21,7 +21,7 @@ stockSchema.statics.findOrCreate = function (stock, cb) {
     if (err) throw err;
     if (!stock) {
       newStock.stockTicker = stock;     
-      newStock.save(cb); // interesting statement
+      newStock.save(cb);
     }
     else cb(err, result);
   });

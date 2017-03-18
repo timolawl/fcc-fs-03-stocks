@@ -6,10 +6,6 @@ const Stock = require('../models/stock');
 
 module.exports = io => {
 
-  // acting as route and controller here.
-  // the structured formatting would help for sure..
-  
-
   io.on('connection', function (socket) {
     socket.on('add ticker', function (data) {
       // first check to see if the stock is already in the db.
@@ -18,10 +14,6 @@ module.exports = io => {
       Stock.findOne({ stockTicker: data.ticker }).exec() // rather than passing a cb to exec..
         .then(stock => {
           if (!stock) {
-            // problem is that it may not be a valid ticker.
-            // need to make a call to another server to check ticker validity.
-            // that or somehow check it frontend, but it's better to check it here too
-
             // checking ticker validity by doing a fetch on the historical data
             let to = new Date();
             let from = new Date(to);
@@ -33,9 +25,6 @@ module.exports = io => {
             
 
             let historicalURL = `http://real-chart.finance.yahoo.com/table.csv?s=${data.ticker}${urlFromSegment}${urlToSegment}`;
-
-       //     console.log(historicalURL);
-
 
             return fetch(historicalURL, { method: 'GET' })
               .then(res => {
@@ -84,7 +73,6 @@ module.exports = io => {
         else socket.emit('error message', { display: false });
         console.log(result);
       });
-      //socket.emit('update processed', {});
       io.emit('update processed', {}); // emit to all users including sender
     });
 
