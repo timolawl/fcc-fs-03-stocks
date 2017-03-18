@@ -87,18 +87,20 @@ window.onload = function () {
     let nameURLs = names.map(stockTicker => 
       `http://autoc.finance.yahoo.com/autoc?query=${stockTicker.toLowerCase()}&region=1&lang=en`);
 
-    names.forEach((name, index) => {
+   // names.forEach((name, index) => {
+    // need the sequential for loop as the generation of the stock UI elements need to be in order for the rows to generate properly
+    for (let i = 0; i < names.length; i++) {
       // check if these items are in session storage, and if the dates match.
       // if so, retrieve from session storage:
-      if (sessionStorage.getItem(name) && checkLastUpdate((JSON.parse(sessionStorage.getItem(name))).lastUpdated)) {
-        let sessionStoredStock = JSON.parse(sessionStorage.getItem(name));
-        seriesOptions[index] = {
-          name: name,
+      if (sessionStorage.getItem(names[i]) && checkLastUpdate((JSON.parse(sessionStorage.getItem(names[i]))).lastUpdated)) {
+        let sessionStoredStock = JSON.parse(sessionStorage.getItem(names[i]));
+        seriesOptions[i] = {
+          name: names[i],
           data: sessionStoredStock.data
         };
         seriesCounter += 1;
 
-        generateStockUIElement(name, sessionStoredStock.company, index);
+        generateStockUIElement(names[i], sessionStoredStock.company, i);
 
         if (seriesCounter === names.length) {
           // actual repaint
@@ -113,16 +115,16 @@ window.onload = function () {
         let sessionData, days;
 
         // grab the full name of the company
-        let promise1 = $.get(nameURLs[index])
+        let promise1 = $.get(nameURLs[i])
         .then(function (data) {
           companyName = data.ResultSet.Result[0].name;
-          generateStockUIElement(name, companyName, index)
+          generateStockUIElement(names[i], companyName, i)
         });
 
 
         let promise2 = 
           // grab historical stock data of the company
-          $.get(historicalURLs[index], function (data) {
+          $.get(historicalURLs[i], function (data) {
             let relevantData = data.split(/\r\n|\n/).sort().map(row => {
               let items = row.split(',');
               // date and stock closing value
@@ -139,12 +141,12 @@ window.onload = function () {
           .then(() => {
             // will also need to save the date too and if the time difference is less than a day,
             // do not try to grab data again?
-            sessionData = { stock: name, company: companyName, data: days, lastUpdated: today };
+            sessionData = { stock: names[i], company: companyName, data: days, lastUpdated: today };
 
-            sessionStorage.setItem(name, JSON.stringify(sessionData));
+            sessionStorage.setItem(names[i], JSON.stringify(sessionData));
 
-            seriesOptions[index] = {
-              name: name,
+            seriesOptions[i] = {
+              name: names[i],
               data: days
             };
 
@@ -156,7 +158,7 @@ window.onload = function () {
               }
           });
       }
-    });    
+    }  
   });
 };
 
@@ -209,6 +211,7 @@ function generateStockUIElement (stockName, companyName, index) {
 
   let highchartColors = Highcharts.getOptions().colors;
 
+  // if not an even number of elements, make a new row.
   if (index % 2 === 0) {
     let newRow = document.createElement('div');
     newRow.classList.add('row');
