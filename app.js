@@ -2,7 +2,7 @@
 
 // es6 modules are not natively supported in V8 yet..
 
- require('dotenv').config(); // loads env vars (don't need in prod)
+// require('dotenv').config(); // loads env vars (don't need in prod)
 
 // built-in requires
 const path = require('path'); // for joining paths
@@ -64,7 +64,7 @@ app.use('/static', express.static(path.join(__dirname,'/static')));
 app.use(favicon(path.join(__dirname, '/static/img/favicon.ico')));
 
 
-app.use(morgan('dev')); // log every request to console.
+// app.use(morgan('dev')); // log every request to console.
 
 
 // configure the session
