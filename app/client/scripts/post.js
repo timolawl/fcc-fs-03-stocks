@@ -217,7 +217,7 @@ function generateStockUIElement (stockName, companyName, index) {
 
   let stockWrapper = document.createElement('div');
   stockWrapper.className = 'wrapper--stock medium-6 large-6 columns';
-  document.querySelector('.stocks').appendChild(stockWrapper);
+  document.querySelector('.stocks').lastChild.appendChild(stockWrapper);
 
   let stock = document.createElement('div');
   stock.className = 'stock';
