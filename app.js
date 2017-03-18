@@ -33,7 +33,7 @@ const session = require('express-session'); // session data is not saved in the 
 const MongoStore = require('connect-mongo')(session); // move store from mem to mongo
 
 // development requires
- const morgan = require('morgan'); // allows for every HTTP request to be logged to console
+// const morgan = require('morgan'); // allows for every HTTP request to be logged to console
 
 // custom requires
 const port = process.env.PORT || 5000;
