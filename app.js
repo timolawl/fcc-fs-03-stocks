@@ -66,6 +66,7 @@ app.use(favicon(path.join(__dirname, '/static/img/favicon.ico')));
 
 app.use(morgan('dev')); // log every request to console.
 
+
 // configure the session
 const sessionMiddleware = session({
     secret: config.sessionSecret,
@@ -93,9 +94,11 @@ app.listen(app.get('port'), () => {
 // but I still need to see if there's even a reason for having socket interact with the session.
 //
 
+/*
 io.use(function(socket, next) {
   sessionMiddleware(socket.request, {}, next);
 });
+*/
 
 
 server.listen(app.get('port'), () => {

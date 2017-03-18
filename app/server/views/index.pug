@@ -15,15 +15,6 @@ section.graph
         input.form__input--remove(class='input-group-field' type='text')
         div(class='input-group-button')
           input.btn.btn--remove(class='button hollow secondary' type='submit' value='-')
-
-  //
-    form
-      label(for='stock--add') Add stock ticker:
-      input.form__stock--add(type='text' name='stock--add'  pattern='^[A-Za-z\\.\\- ]{1,7}$')
-      button.btn.btn--submit(type='submit') Submit
-      label(for='stock--remove') Remove stock ticker:
-      input.form__stock--remove(type='text' name='stock--remove' pattern='^[A-Za-z\\.\\- ]{1,7}$')
-      button.btn.btn--remove(type='submit') Remove
   .error-message.visibility--hide Invalid stock code.
 section.stocks
 //

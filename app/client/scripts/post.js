@@ -140,8 +140,6 @@ window.onload = function () {
             // will also need to save the date too and if the time difference is less than a day,
             // do not try to grab data again?
             sessionData = { stock: name, company: companyName, data: days, lastUpdated: today };
-            console.log('session data for: ' + name + ' ' + companyName);
-            console.log(sessionData);
 
             sessionStorage.setItem(name, JSON.stringify(sessionData));
 
@@ -219,7 +217,7 @@ function generateStockUIElement (stockName, companyName, index) {
 
   let stockWrapper = document.createElement('div');
   stockWrapper.className = 'wrapper--stock medium-6 large-6 columns';
-  document.querySelector('.stocks').lastChild.appendChild(stockWrapper);
+  document.querySelector('.stocks').appendChild(stockWrapper);
 
   let stock = document.createElement('div');
   stock.className = 'stock';

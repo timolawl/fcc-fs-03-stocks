@@ -1,22 +1,4 @@
 $primary-color: #1779ba; // foundation blue
-$secondary-color: #999; // gray #808080; // gray
-$highlight-color: #F29D35; // lamplight #f15a29; // was orange
-$background-color: #011C40; // darkblue
-
-// z-index values:
-/*
-$base-layer: 1;
-$mainbox-layer: 10;
-$overlay-layer: 100;
-$modal-layer: 1000;
-*/
-/*
-$zindex: (
-  modal:    9000,
-  overlay:  8000,
-  mainbox:  7000
-);
-*/
 
 /********************************************************/
 // helpers
@@ -53,7 +35,6 @@ body {
   margin: 2rem auto;
 }
 
-
 button {
   border: none;
   &:hover {
@@ -67,8 +48,6 @@ button {
   margin-bottom: 0;
 }
 
-
-
 /********************************************************/
 // personal classes
 
@@ -79,7 +58,6 @@ button {
 .chart {
   width: 100%;
   max-width: 960px;
-  // border: 1px solid black;
 }
 
 .form {
@@ -106,11 +84,11 @@ button {
   margin: 0.5rem;
   position: relative;
   text-align: right;
- // display: inline-block;
-  //border: 1px solid #cacaca;
   padding: 1rem;
-  //margin: 1rem;
 
+  // no reason to do something like this;
+  // can just make a wrapper and set the margin on the inner div
+  // to simulate an "internal" border
   /*
   &:before {
     position: absolute;
@@ -135,8 +113,6 @@ button {
     font-size: 2rem;
     font-weight: bold;
     color: gray;
-    //vertical-align: bottom;
-  //  text-align: left; 
   }
 
   &__company-name {
@@ -161,18 +137,9 @@ button {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      
     }
   }
 }
-
-
-/********************************************************/
-// the svg 'cross.svg'
-//.cross {
-//  fill: gray;
-//}
-
 
 /********************************************************/
 footer {

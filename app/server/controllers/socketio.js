@@ -9,7 +9,6 @@ module.exports = io => {
   io.on('connection', function (socket) {
     socket.on('add ticker', function (data) {
       // first check to see if the stock is already in the db.
-      console.log(data.ticker);
 
       Stock.findOne({ stockTicker: data.ticker }).exec() // rather than passing a cb to exec..
         .then(stock => {
@@ -22,7 +21,6 @@ module.exports = io => {
 
             let urlFromSegment = `&a=${from.getUTCMonth()}&b=${from.getUTCDate()}&c=${from.getUTCFullYear()}`;
             let urlToSegment = `&a=${to.getUTCMonth()}&b=${to.getUTCDate()}&c=${to.getUTCFullYear()}`;
-            
 
             let historicalURL = `http://real-chart.finance.yahoo.com/table.csv?s=${data.ticker}${urlFromSegment}${urlToSegment}`;
 
@@ -30,33 +28,27 @@ module.exports = io => {
               .then(res => {
           
                 if (res.status !== 404) {
-                  console.log('stock exists! adding to db');
                   let newStock = new Stock();
                   newStock.stockTicker = data.ticker;
                   socket.emit('error message', { display: false });
                   return newStock.save(err => {
                     if (err) {
-                      console.error(err);
                       throw err;
                     }
                   });
                 }
                 else {
-                  console.log('No stock is found under this name.');
                   socket.emit('error message', { display: true });
                 }
               }); 
-
-            console.log('no stock was found with the given stock ticker...');
           }
           else {
             socket.emit('stock already added', {});
-            console.log('stock is already in the db...');
           }
         })
         .then(() => {
           Stock.find({}, (err, stocks) => {
-            console.log('Stock(s) currently in the db are: ' + stocks);
+            // console.log('Stock(s) currently in the db are: ' + stocks);
           });
         })
 
@@ -64,14 +56,12 @@ module.exports = io => {
     });
 
     socket.on('remove ticker', function (data) {
-      console.log('removing ticker...');
       Stock.deleteOne({ stockTicker: data.ticker }, (err, result) => {
         if (err) throw err;
         if (!result.deletedCount) {
           socket.emit('error message', { display: true });
         }
         else socket.emit('error message', { display: false });
-        console.log(result);
       });
       io.emit('update processed', {}); // emit to all users including sender
     });
@@ -80,11 +70,10 @@ module.exports = io => {
       Stock.find({}, (err, stocks) => {
         if (err) throw err;
         if (!stocks) {
-          console.log('no stocks found.');
+          console.error('no stocks found.');
         }
         else {
           let stockTickersArray = stocks.map(stock => stock.stockTicker);
-          console.log(stockTickersArray);
 
           socket.emit('repaint', { stockTickers: stockTickersArray });
         }
