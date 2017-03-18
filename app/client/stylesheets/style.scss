@@ -1,4 +1,4 @@
-$primary-color: #024059; // darkteal //#011C40; // darkblue #add8e6; // lightblue
+$primary-color: #1779ba; // foundation blue
 $secondary-color: #999; // gray #808080; // gray
 $highlight-color: #F29D35; // lamplight #f15a29; // was orange
 $background-color: #011C40; // darkblue
@@ -10,12 +10,13 @@ $mainbox-layer: 10;
 $overlay-layer: 100;
 $modal-layer: 1000;
 */
-
+/*
 $zindex: (
   modal:    9000,
   overlay:  8000,
   mainbox:  7000
 );
+*/
 
 /********************************************************/
 // helpers
@@ -37,3 +38,144 @@ $zindex: (
 
 
 /********************************************************/
+// generics
+
+*, :before, :after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+body {
+  width: 80%;
+  max-width: 960px;
+  margin: 2rem auto;
+}
+
+
+button {
+  border: none;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+/********************************************************/
+// foundation overrides:
+.input-group {
+  margin-bottom: 0;
+}
+
+
+
+/********************************************************/
+// personal classes
+
+.site__title {
+  font-size: 1.5rem;
+}
+
+.chart {
+  width: 100%;
+  max-width: 960px;
+  // border: 1px solid black;
+}
+
+.form {
+  &--ticker {
+    padding: 0.5rem;
+  }
+  &__input {
+    &--add, &--remove {
+      text-align: left;
+    }
+  }
+}
+
+.error-message {
+  color: #cc4b37; // foundation red
+  margin-bottom: 1rem;
+}
+
+.wrapper--stock {
+  padding: 0;
+}
+
+.stock {
+  margin: 0.5rem;
+  position: relative;
+  text-align: right;
+ // display: inline-block;
+  //border: 1px solid #cacaca;
+  padding: 1rem;
+  //margin: 1rem;
+
+  /*
+  &:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    //content: '';
+    content: '';
+    height: calc(100% - 0.6rem);
+    width: calc(100% - 0.6rem);
+    border: 1px solid attr(data-border-color);
+    margin: 0.3rem;
+  }
+  */
+
+  &__ticker {
+    position: absolute;
+    top: 50%;
+    left: 0.5rem;
+    transform: translateY(-50%);
+
+    font-family: 'Work Sans';
+    font-size: 2rem;
+    font-weight: bold;
+    color: gray;
+    //vertical-align: bottom;
+  //  text-align: left; 
+  }
+
+  &__company-name {
+    margin-right: 1rem;
+    text-align: right;
+    display: inline-block;
+    font-family: Roboto;
+    font-size: 0.8rem;
+    
+  }
+  
+  &__remove {
+    margin: 0;
+    position: relative;
+    width: 40px;
+    height: 40px;
+
+    &--icon {
+      padding-bottom: 0.1rem;
+      
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      
+    }
+  }
+}
+
+
+/********************************************************/
+// the svg 'cross.svg'
+//.cross {
+//  fill: gray;
+//}
+
+
+/********************************************************/
+footer {
+  margin-top: 2rem;
+}
+

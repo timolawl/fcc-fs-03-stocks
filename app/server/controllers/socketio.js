@@ -46,7 +46,10 @@ module.exports = io => {
                   newStock.stockTicker = data.ticker;
                   socket.emit('error message', { display: false });
                   return newStock.save(err => {
-                    if (err) throw err;
+                    if (err) {
+                      console.error(err);
+                      throw err;
+                    }
                   });
                 }
                 else {

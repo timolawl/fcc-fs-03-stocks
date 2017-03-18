@@ -7,7 +7,7 @@ const stockSchema = new mongoose.Schema({
                  required: [true, 'Stock ticker required'],
                  validate: {
                    validator: function (v) {
-                     return /^[A-Za-z\\.\\- ]{1,7}$/.test(v);
+                     return /^[A-Za-z\.\- ]{1,7}$/.test(v);
                    },
                    message: '{VALUE} is not a valid stock ticker!'
                  } 

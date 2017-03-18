@@ -29,21 +29,26 @@ window.onload = function () {
   });
 
   // add stock
-  document.querySelector('.submit-btn').addEventListener('click', e => {
+  document.querySelector('.btn--submit').addEventListener('click', e => {
     e.preventDefault(); // this is why the form submission goes through anyway even with the pattern field
     // Use the title attribute to describe the pattern to help the user.
-    console.log(document.querySelector('.stock-ticker').value);
-    if (document.querySelector('.stock-ticker').value) { 
+    
+    //console.log(document.querySelector('.form__input--add').value);
+    if (document.querySelector('.form__input--add').value) { 
       // may want to sanitize this before passing it along
-      socket.emit('add ticker', { ticker: document.querySelector('.stock-ticker').value.toUpperCase() });
+      socket.emit('add ticker', { ticker: document.querySelector('.form__input--add').value.toUpperCase() });
+      // clear the input field
+      document.querySelector('.form__input--add').value = '';
     }
   });
   
   // remove stock
-  document.querySelector('.delete-btn').addEventListener('click', e => {
+  document.querySelector('.btn--remove').addEventListener('click', e => {
     e.preventDefault();
-    if (document.querySelector('.delete-stock-ticker').value) {
-      socket.emit('remove ticker', { ticker: document.querySelector('.delete-stock-ticker').value.toUpperCase() });
+    if (document.querySelector('.form__input--remove').value) {
+      socket.emit('remove ticker', { ticker: document.querySelector('.form__input--remove').value.toUpperCase() });
+      // clear the input field
+      document.querySelector('.form__input--remove').value = '';
     }
   });
 
@@ -204,7 +209,7 @@ window.onload = function () {
 
 // http://www.highcharts.com/stock/demo/compare
 function createChart (seriesOptions) {
-  Highcharts.stockChart('chart', {
+  Highcharts.stockChart(document.querySelector('.chart'), {
     rangeSelector: {
       selected: 4
     },
@@ -262,13 +267,26 @@ function generateStockUIElement (stockName, companyName, index) {
  // console.log(highchartColors);
  // console.log(index);
 
+  if (index % 2 === 0) {
+    let newRow = document.createElement('div');
+    newRow.classList.add('row');
+    document.querySelector('.stocks').appendChild(newRow);
+  }
+
+  let stockWrapper = document.createElement('div');
+  stockWrapper.className = 'wrapper--stock medium-6 large-6 columns';
+  document.querySelector('.stocks').lastChild.appendChild(stockWrapper);
+
+
   console.log('color for ' + stockName + ': ' + highchartColors[index]);
   //let fragment = document.createDocumentFragment();
   let stock = document.createElement('div');
-  stock.classList.add('stock');
+  stock.className = 'stock';
  // stock.classList.add(stockName);
-  stock.style.background = highchartColors[index];
-  document.querySelector('.stocks').appendChild(stock);
+  //stock.style.background = highchartColors[index];
+  stock.style.border = '1px solid ' + highchartColors[index];
+  stock.setAttribute('data-border-color', highchartColors[index]);
+  stockWrapper.appendChild(stock);
   let ticker = document.createElement('div');
   ticker.classList.add('stock__ticker');
   ticker.textContent = stockName;
@@ -277,12 +295,39 @@ function generateStockUIElement (stockName, companyName, index) {
   company.classList.add('stock__company-name');
   company.textContent = companyName;
   stock.appendChild(company);
-  let remove = document.createElement('button');
-  remove.textContent = 'X';
+  /*
+  let remove = document.createElement('img');
+  remove.src = '/static/img/cross.svg';
+  remove.classList.add('stock__remove');
+  remove.textContent = 'Remove';
   stock.appendChild(remove);
   remove.addEventListener('click', e => {
     socket.emit('remove ticker', { ticker: stockName });
     e.target.parentNode.parentNode.removeChild(e.target.parentNode);
   });
+  */
+  let remove = document.createElement('button');
+  remove.className = 'hollow button alert stock__remove';
+  remove.setAttribute('type', 'button');
+  stock.appendChild(remove);
+  let srClose = document.createElement('span');
+  srClose.classList.add('show-for-sr');
+  srClose.textContent = 'Close';
+  remove.appendChild(srClose);
+  let close = document.createElement('span');
+  close.classList.add('stock__remove--icon');
+  close.setAttribute('aria-hidden', 'true');
+  close.innerHTML = '&times;';
+  remove.appendChild(close);
+  /*
+  let icon = document.createElement('i');
+  icon.classList.add('fi-x');
+  close.appendChild(icon);
+  */
+  remove.addEventListener('click', e => {
+    socket.emit('remove ticker', { ticker: stockName });
+    e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+  });
+
 
 }
