@@ -22,6 +22,9 @@ window.onload = function () {
   // initialize chart here
   socket.emit('request tickers', {});
   
+  // show the loader until the chart displays:
+  document.querySelector('.chart-loader').classList.remove('display--hide');
+  
 
   // any update to the trackers will trigger a repaint
   socket.on('update processed', function (data) {
@@ -115,6 +118,8 @@ window.onload = function () {
       //    generateStockUIElement(name, sessionStoredStock.company, index);
 
           if (seriesCounter === names.length) {
+            // remove cog loader
+            document.querySelector('.chart-loader').classList.add('display--hide');
             // actual repaint
             createChart(seriesOptions);
           }
@@ -164,9 +169,12 @@ window.onload = function () {
               seriesCounter += 1;
 
               if (seriesCounter === names.length) {
-                  // actual repaint
-                  createChart(seriesOptions);
-                }
+                // remove cog loader
+                document.querySelector('.chart-loader').classList.add('display--hide');
+                // actual repaint
+                createChart(seriesOptions);
+
+              }
             });
         }
     });

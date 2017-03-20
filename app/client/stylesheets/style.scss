@@ -60,6 +60,38 @@ button {
   max-width: 960px;
 }
 
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// cog wheel loader
+.chart-loader {
+  width: 10%;
+  // position: absolute;
+  // top: 50%;
+  // left: 50%;
+  animation-name: rotation;
+  animation-duration: 3s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  transform-origin: 50% 50%;
+
+  .ct0, .ct1 {
+    stroke: #999;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-miterlimit: 10;
+  }
+  .ct0 {
+    fill: none;
+  }
+  .ct1 {
+    fill: none;
+  }
+}
+
 .form {
   &--ticker {
     padding: 0.5rem;
