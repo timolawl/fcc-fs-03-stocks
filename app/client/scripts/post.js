@@ -31,21 +31,33 @@ window.onload = function () {
   // add stock
   document.querySelector('.btn--submit').addEventListener('click', e => {
     e.preventDefault(); // this is why the form submission goes through anyway even with the pattern field
-    if (document.querySelector('.form__input--add').value) { 
+    // client side limiting of string length:
+    let inputAdd = document.querySelector('.form__input--add').value;
+
+    if (inputAdd && /^[A-Za-z][A-Za-z\.:]{0,9}$/.test(inputAdd)) { // limit string length
       // may want to sanitize this before passing it along
       socket.emit('add ticker', { ticker: document.querySelector('.form__input--add').value.toUpperCase() });
       // clear the input field
       document.querySelector('.form__input--add').value = '';
+    }
+    else {
+      // show error message
+      document.querySelector('.error-message').classList.remove('visibility--hide');
     }
   });
   
   // remove stock
   document.querySelector('.btn--remove').addEventListener('click', e => {
     e.preventDefault();
-    if (document.querySelector('.form__input--remove').value) {
+    let inputRemove = document.querySelector('.form__input--remove').value;
+    if (inputRemove && /^[A-Za-z][A-Za-z\.:]{0,9}$/.test(inputAdd)) {
       socket.emit('remove ticker', { ticker: document.querySelector('.form__input--remove').value.toUpperCase() });
       // clear the input field
       document.querySelector('.form__input--remove').value = '';
+    }
+    else {
+      // show error message
+      document.querySelector('.error-message').classList.remove('visibility--hide');
     }
   });
 
