@@ -87,80 +87,90 @@ window.onload = function () {
     let nameURLs = names.map(stockTicker => 
       `http://autoc.finance.yahoo.com/autoc?query=${stockTicker.toLowerCase()}&region=1&lang=en`);
 
-   // names.forEach((name, index) => {
+    let promises = names.map((name, index) => {
     // need the sequential for loop as the generation of the stock UI elements need to be in order for the rows to generate properly
-    for (let i = 0; i < names.length; i++) {
+   // for (let i = 0; i < names.length; i++) {
       // check if these items are in session storage, and if the dates match.
       // if so, retrieve from session storage:
-      if (sessionStorage.getItem(names[i]) && checkLastUpdate((JSON.parse(sessionStorage.getItem(names[i]))).lastUpdated)) {
-        let sessionStoredStock = JSON.parse(sessionStorage.getItem(names[i]));
-        seriesOptions[i] = {
-          name: names[i],
-          data: sessionStoredStock.data
-        };
-        seriesCounter += 1;
+        if (sessionStorage.getItem(name) && checkLastUpdate((JSON.parse(sessionStorage.getItem(name))).lastUpdated)) {
+          let sessionStoredStock = JSON.parse(sessionStorage.getItem(name));
+          seriesOptions[index] = {
+            name: name,
+            data: sessionStoredStock.data
+          };
+          seriesCounter += 1;
 
-        generateStockUIElement(names[i], sessionStoredStock.company, i);
+      //    generateStockUIElement(name, sessionStoredStock.company, index);
 
-        if (seriesCounter === names.length) {
-          // actual repaint
-          createChart(seriesOptions);
+          if (seriesCounter === names.length) {
+            // actual repaint
+            createChart(seriesOptions);
+          }
+
         }
+        // otherwise, ajax the data
+        else {
+          let companyName = '';
+          let today = new Date();
+          let sessionData, days;
 
-      }
-      // otherwise, ajax the data
-      else {
-        let companyName = '';
-        let today = new Date();
-        let sessionData, days;
-
-        // grab the full name of the company
-        let promise1 = $.get(nameURLs[i])
-        .then(function (data) {
-          companyName = data.ResultSet.Result[0].name;
-          generateStockUIElement(names[i], companyName, i)
-        });
-
-
-        let promise2 = 
-          // grab historical stock data of the company
-          $.get(historicalURLs[i], function (data) {
-            let relevantData = data.split(/\r\n|\n/).sort().map(row => {
-              let items = row.split(',');
-              // date and stock closing value
-              return [Date.parse(items[0]), parseFloat((+items[4]).toFixed(2))]; 
-            });
-            
-            days = relevantData.filter((row, i) => {
-              return row[0] && i !== 0; // remove title rows and non-content rows
-            });
+          // grab the full name of the company
+          let promise1 = $.get(nameURLs[index])
+          .then((data) => {
+            companyName = data.ResultSet.Result[0].name;
+          //  generateStockUIElement(name, companyName, index);
           });
 
 
-        Promise.all([promise1, promise2])
-          .then(() => {
-            // will also need to save the date too and if the time difference is less than a day,
-            // do not try to grab data again?
-            sessionData = { stock: names[i], company: companyName, data: days, lastUpdated: today };
+          let promise2 = 
+            // grab historical stock data of the company
+            $.get(historicalURLs[index])
+              .then((data) => {
+              let relevantData = data.split(/\r\n|\n/).sort().map(row => {
+                let items = row.split(',');
+                // date and stock closing value
+                return [Date.parse(items[0]), parseFloat((+items[4]).toFixed(2))]; 
+              });
+              
+              days = relevantData.filter((row, i) => {
+                return row[0] && i !== 0; // remove title rows and non-content rows
+              });
+            });
 
-            sessionStorage.setItem(names[i], JSON.stringify(sessionData));
+          return Promise.all([promise1, promise2])
+            .then(() => {
+              // will also need to save the date too and if the time difference is less than a day,
+              // do not try to grab data again?
+              sessionData = { stock: name, company: companyName, data: days, lastUpdated: today };
+              sessionStorage.setItem(name, JSON.stringify(sessionData));
 
-            seriesOptions[i] = {
-              name: names[i],
-              data: days
-            };
+              seriesOptions[index] = {
+                name: name,
+                data: days
+              };
 
-            seriesCounter += 1;
+              seriesCounter += 1;
 
-            if (seriesCounter === names.length) {
-                // actual repaint
-                createChart(seriesOptions);
-              }
-          });
-      }
-    }  
+              if (seriesCounter === names.length) {
+                  // actual repaint
+                  createChart(seriesOptions);
+                }
+            });
+        }
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        for (let i = 0; i < names.length; i++) {
+          let company = JSON.parse(sessionStorage.getItem(names[i]));
+          generateStockUIElement(names[i], company.company, i);
+        }
+      });
+
   });
 };
+
+
 
 // http://www.highcharts.com/stock/demo/compare
 function createChart (seriesOptions) {
@@ -208,19 +218,29 @@ function checkLastUpdate (date) {
 }
 
 function generateStockUIElement (stockName, companyName, index) {
+  // create document fragment
+  let fragment = document.createDocumentFragment();
 
   let highchartColors = Highcharts.getOptions().colors;
+
+  // wrapper around a stock element
+  let stockWrapper = document.createElement('div');
+  stockWrapper.className = 'wrapper--stock medium-6 large-6 columns';
+
+  console.log(stockName + ' ' + index);
 
   // if not an even number of elements, make a new row.
   if (index % 2 === 0) {
     let newRow = document.createElement('div');
     newRow.classList.add('row');
-    document.querySelector('.stocks').appendChild(newRow);
+    newRow.classList.add('row-' + index);
+    console.log('appending row ' + index);
+    fragment.appendChild(newRow);
+    newRow.appendChild(stockWrapper);
   }
-
-  let stockWrapper = document.createElement('div');
-  stockWrapper.className = 'wrapper--stock medium-6 large-6 columns';
-  document.querySelector('.stocks').lastChild.appendChild(stockWrapper);
+  else {
+    fragment.appendChild(stockWrapper);
+  }
 
   let stock = document.createElement('div');
   stock.className = 'stock';
@@ -254,6 +274,17 @@ function generateStockUIElement (stockName, companyName, index) {
     socket.emit('remove ticker', { ticker: stockName });
     e.target.parentNode.parentNode.removeChild(e.target.parentNode);
   });
+
+  // depending on whether a new row was made or not, append appropriately:
+  if (index % 2 === 0) {
+    console.log('appending fragment to new row');
+    document.querySelector('.stocks').appendChild(fragment);
+  }
+  else {
+    console.log('appending fragment to old row (stock index): ' + index);
+    document.querySelector('.stocks').lastChild.appendChild(fragment);
+    
+  }
 
 
 }
