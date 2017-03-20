@@ -239,14 +239,11 @@ function generateStockUIElement (stockName, companyName, index) {
   let stockWrapper = document.createElement('div');
   stockWrapper.className = 'wrapper--stock medium-6 large-6 columns';
 
-  console.log(stockName + ' ' + index);
-
   // if not an even number of elements, make a new row.
   if (index % 2 === 0) {
     let newRow = document.createElement('div');
     newRow.classList.add('row');
     newRow.classList.add('row-' + index);
-    console.log('appending row ' + index);
     fragment.appendChild(newRow);
     newRow.appendChild(stockWrapper);
   }
@@ -289,11 +286,9 @@ function generateStockUIElement (stockName, companyName, index) {
 
   // depending on whether a new row was made or not, append appropriately:
   if (index % 2 === 0) {
-    console.log('appending fragment to new row');
     document.querySelector('.stocks').appendChild(fragment);
   }
   else {
-    console.log('appending fragment to old row (stock index): ' + index);
     document.querySelector('.stocks').lastChild.appendChild(fragment);
     
   }

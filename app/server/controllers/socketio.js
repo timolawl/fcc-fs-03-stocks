@@ -15,7 +15,6 @@ module.exports = io => {
       // just test the string against a regex:
       if(!/^[A-Za-z][A-Za-z\.:]{0,9}$/.test(data.ticker)) {
         socket.emit('error message', { display: true });
-        console.log('validation failed');
         // return to break off if the test fails
         return;
       }
@@ -70,7 +69,6 @@ module.exports = io => {
       // check if ticker:
       if(!/^[A-Za-z][A-Za-z\.:]{0,9}$/.test(data.ticker)) {
         socket.emit('error message', { display: true });
-        console.log('validation failed');
         // return to break off if the test fails
         return;
       }
