@@ -134,5 +134,5 @@ gulp.task('watch', ['build'], () => {
   //    gulp.watch('*', browserSync.reload);
 });
 
-gulp.task('build', ['sass', 'script']);
+gulp.task('build', ['sass', 'script', 'image']);
 gulp.task('default', ['refreshers']);
