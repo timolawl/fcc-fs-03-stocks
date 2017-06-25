@@ -4,8 +4,10 @@
   "description": "Nightlife coordination app, a Free Code Camp full-stack project",
   "main": "app.js",
   "scripts": {
+    "build": "NODE_ENV=production gulp build",
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",
