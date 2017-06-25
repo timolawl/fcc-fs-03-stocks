@@ -48,6 +48,12 @@ button {
   margin-bottom: 0;
 }
 
+.button {
+  &:focus {
+    outline: none;
+  }
+}
+
 /********************************************************/
 // personal classes
 

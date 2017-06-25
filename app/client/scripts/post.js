@@ -3,14 +3,13 @@
 // socket io -- the cdnjs script is in the HTML template above this script file
 var socket = io();
 
-// https://www.npmjs.com/package/cors-anywhere
-jQuery.ajaxPrefilter(function(options) {
-    if (options.crossDomain && jQuery.support.cors) {
-        options.url = 'https://cors-anywhere.herokuapp.com/' + options.url;
-    }
-});
-
 window.onload = function () {
+
+  // conditions for removing the cog loader:
+  socket.on('no tickers', () => {
+  // remove cog loader
+    document.querySelector('.chart-loader').classList.add('display--hide');
+  });
 
   socket.on('error message', function (data) {
     if (data.display) {
@@ -32,7 +31,8 @@ window.onload = function () {
   });
 
   // add stock
-  document.querySelector('.btn--submit').addEventListener('click', e => {
+  // document.querySelector('.btn--submit').addEventListener('submit', e => {
+  document.querySelector('.stock--add').addEventListener('submit', e => {
     e.preventDefault(); // this is why the form submission goes through anyway even with the pattern field
     // client side limiting of string length:
     let inputAdd = document.querySelector('.form__input--add').value;
@@ -50,10 +50,11 @@ window.onload = function () {
   });
   
   // remove stock
-  document.querySelector('.btn--remove').addEventListener('click', e => {
+  // document.querySelector('.btn--remove').addEventListener('submit', e => {
+  document.querySelector('.stock--remove').addEventListener('submit', e => {
     e.preventDefault();
     let inputRemove = document.querySelector('.form__input--remove').value;
-    if (inputRemove && /^[A-Za-z][A-Za-z\.:]{0,9}$/.test(inputAdd)) {
+    if (inputRemove && /^[A-Za-z][A-Za-z\.:]{0,9}$/.test(inputRemove)) {
       socket.emit('remove ticker', { ticker: document.querySelector('.form__input--remove').value.toUpperCase() });
       // clear the input field
       document.querySelector('.form__input--remove').value = '';
@@ -68,7 +69,6 @@ window.onload = function () {
   // have this triggered on first load to load the first painting of highcharts
   // and for subsequent paintings, just retrigger this socket event with updated data
   socket.on('repaint', function (data) {
-
     // remove all old elements:
     let stocksNode = document.querySelector('.stocks');
     while(stocksNode.firstChild) {
@@ -78,6 +78,8 @@ window.onload = function () {
     // seems horribly inefficient to redo all the AJAX calls, redraws/repaints after each addition/subtraction of a stock ticker, but this seems the price to pay for not saving the stock data beyond the name to the db.
     // it is possible to use local storage to save the previous data and retrieve it there instead of making repeated AJAX calls
     
+    // a good balance is to only remove those elements that are out of date by at least a day.
+    
     // storing retrieved data in session storage:
 
     // following the highcharts example:
@@ -85,26 +87,7 @@ window.onload = function () {
         seriesCounter = 0,
         names = data.stockTickers;
 
-    let to = new Date();
-    let from = new Date(to);
-  
-    from.setMonth(to.getMonth() - 12);
-
-    let urlFromSegment = `&a=${from.getUTCMonth()}&b=${from.getUTCDate()}&c=${from.getUTCFullYear()}`;
-    let urlToSegment = `&a=${to.getUTCMonth()}&b=${to.getUTCDate()}&c=${to.getUTCFullYear()}`;
-
-    let historicalURLs = names.map(stockTicker =>
-      `http://real-chart.finance.yahoo.com/table.csv?s=${stockTicker}${urlFromSegment}${urlToSegment}`);
-
-
-  //    let companyNameURL = 'http://autoc.finance.yahoo.com/autoc?query=mcd&region=1&lang=en';
-
-    let nameURLs = names.map(stockTicker => 
-      `http://autoc.finance.yahoo.com/autoc?query=${stockTicker.toLowerCase()}&region=1&lang=en`);
-
     let promises = names.map((name, index) => {
-    // need the sequential for loop as the generation of the stock UI elements need to be in order for the rows to generate properly
-   // for (let i = 0; i < names.length; i++) {
       // check if these items are in session storage, and if the dates match.
       // if so, retrieve from session storage:
         if (sessionStorage.getItem(name) && checkLastUpdate((JSON.parse(sessionStorage.getItem(name))).lastUpdated)) {
@@ -114,8 +97,6 @@ window.onload = function () {
             data: sessionStoredStock.data
           };
           seriesCounter += 1;
-
-      //    generateStockUIElement(name, sessionStoredStock.company, index);
 
           if (seriesCounter === names.length) {
             // remove cog loader
@@ -131,30 +112,28 @@ window.onload = function () {
           let today = new Date();
           let sessionData, days;
 
-          // grab the full name of the company
-          let promise1 = $.get(nameURLs[index])
-          .then((data) => {
-            companyName = data.ResultSet.Result[0].name;
-          //  generateStockUIElement(name, companyName, index);
-          });
+          let to = new Date();
+          let from = new Date(to);
 
+          from.setMonth(to.getMonth() - 12);
 
-          let promise2 = 
-            // grab historical stock data of the company
-            $.get(historicalURLs[index])
-              .then((data) => {
-              let relevantData = data.split(/\r\n|\n/).sort().map(row => {
-                let items = row.split(',');
-                // date and stock closing value
-                return [Date.parse(items[0]), parseFloat((+items[4]).toFixed(2))]; 
-              });
-              
-              days = relevantData.filter((row, i) => {
-                return row[0] && i !== 0; // remove title rows and non-content rows
-              });
-            });
+          let month = from.getUTCMonth() + 1;
+          if (month < 10) {
+            month = `0${month}`;
+          }
 
-          return Promise.all([promise1, promise2])
+          let urlFromSegment = `${from.getUTCFullYear()}-${month}-${from.getUTCDate() - 2}`;
+          let urlToSegment = `${to.getUTCFullYear()}-${month}-${to.getUTCDate() - 2}`;
+
+          let URL = `https://www.quandl.com/api/v3/datasets/WIKI/${name}.json?api_key=hnTnwtHfNGzsTTSxAFZ4&start_date=${urlFromSegment}&end_date=${urlToSegment}`;
+
+          return fetch(URL)
+            .then(res => res.json())
+            .then(json => {
+              const re = /^(.*?)\(/;
+              companyName = json.dataset.name.match(re)[1];
+              days = json.dataset.data.map(data => [Date.parse(data[0]), data[4]]).sort();
+            })
             .then(() => {
               // will also need to save the date too and if the time difference is less than a day,
               // do not try to grab data again?
@@ -173,7 +152,6 @@ window.onload = function () {
                 document.querySelector('.chart-loader').classList.add('display--hide');
                 // actual repaint
                 createChart(seriesOptions);
-
               }
             });
         }

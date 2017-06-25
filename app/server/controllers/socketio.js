@@ -28,12 +28,22 @@ module.exports = io => {
             
               from.setMonth(to.getMonth() - 12);
 
+              let month = from.getUTCMonth() + 1;
+              if (month < 10) {
+                month = `0${month}`;
+              }
+
+              let urlFromSegment = `${from.getUTCFullYear()}-${month}-${from.getUTCDate() - 2}`;
+              let urlToSegment = `${to.getUTCFullYear()}-${month}-${to.getUTCDate() - 2}`;
+
+              let historicalURL = `https://www.quandl.com/api/v3/datasets/WIKI/${data.ticker}.json?api_key=hnTnwtHfNGzsTTSxAFZ4&start_date=${urlFromSegment}&end_date=${urlToSegment}`;
+/*
               let urlFromSegment = `&a=${from.getUTCMonth()}&b=${from.getUTCDate()}&c=${from.getUTCFullYear()}`;
               let urlToSegment = `&a=${to.getUTCMonth()}&b=${to.getUTCDate()}&c=${to.getUTCFullYear()}`;
 
               let historicalURL = `http://real-chart.finance.yahoo.com/table.csv?s=${data.ticker}${urlFromSegment}${urlToSegment}`;
-
-              return fetch(historicalURL, { method: 'GET' })
+*/
+              return fetch(historicalURL)
                 .then(res => {
             
                   if (res.status !== 404) {
@@ -87,12 +97,11 @@ module.exports = io => {
     socket.on('request tickers', function (data) {
       Stock.find({}, (err, stocks) => {
         if (err) throw err;
-        if (!stocks) {
-          console.error('no stocks found.');
+        if (Array.isArray(stocks) && stocks.length === 0) {
+          socket.emit('no tickers', {});
         }
         else {
           let stockTickersArray = stocks.map(stock => stock.stockTicker);
-
           socket.emit('repaint', { stockTickers: stockTickersArray });
         }
       });

@@ -8,13 +8,13 @@ section.graph
       circle(class='ct1' cx='48' cy='48' r='30')
   div(class='row')
     div.form--ticker(class='medium-6 large-6 columns')
-      div(class='input-group')
+      form(class='input-group stock--add')
         span(class='input-group-label') Add Stock:
         input.form__input--add(class='input-group-field' type='text')
         div(class='input-group-button')
           input.btn.btn--submit(class='button hollow secondary' type='submit' value='+')
     div.form--ticker(class='medium-6 large-6 columns')
-      div(class='input-group')
+      form(class='input-group stock--remove')
         span(class='input-group-label') Remove Stock:
         input.form__input--remove(class='input-group-field' type='text')
         div(class='input-group-button')
