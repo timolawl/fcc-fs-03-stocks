@@ -123,7 +123,7 @@ gulp.task('script', () => {
 gulp.task('image', () => {
   const s1 = gulp.src('./app/client/images/favicon.ico')
     .pipe(gulp.dest('./static/img'));
-  const s2 gulp.src('./app/client/images/**/*.+(png|jpg|gif|svg)')
+  const s2 = gulp.src('./app/client/images/**/*.+(png|jpg|gif|svg)')
         .pipe(imagemin())
         .pipe(gulp.dest('./static/img'));
 
