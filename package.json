@@ -1,7 +1,7 @@
 {
-  "name": "timolawl-nightlife",
+  "name": "timolawl-stocks",
   "version": "1.0.0",
-  "description": "Nightlife coordination app, a Free Code Camp full-stack project",
+  "description": "Stocks, a Free Code Camp full-stack project",
   "main": "app.js",
   "scripts": {
     "build": "NODE_ENV=production gulp build",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/timolawl/fcc-nightlife.git"
+    "url": "git+ssh://git@github.com/timolawl/fcc-stocks.git"
   },
   "author": "Tim Chiang <timolawl@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/timolawl/fcc-nightlife/issues"
+    "url": "https://github.com/timolawl/fcc-stocks/issues"
   },
-  "homepage": "https://github.com/timolawl/fcc-nightlife#readme",
+  "homepage": "https://github.com/timolawl/fcc-stocks#readme",
   "dependencies": {
     "body-parser": "^1.17.2",
     "compression": "^1.6.2",
