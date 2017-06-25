@@ -22,7 +22,7 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const browserify = require('browserify');
 const babelify = require('babelify');
-const es = require('event-stream');
+const merge = require('merge-stream');
 const rename = require('gulp-rename');
 
 const imagemin = require('gulp-imagemin');
@@ -117,13 +117,17 @@ gulp.task('script', () => {
     });
 
     // create a merged stream
-    return es.merge.apply(null, tasks);
+    return merge.apply(null, tasks);
 });
 
 gulp.task('image', () => {
-    return gulp.src('./app/client/images/**/*.+(png|jpg|gif|svg)')
+  const s1 = gulp.src('./app/client/images/favicon.ico')
+    .pipe(gulp.dest('./static/img'));
+  const s2 gulp.src('./app/client/images/**/*.+(png|jpg|gif|svg)')
         .pipe(imagemin())
         .pipe(gulp.dest('./static/img'));
+
+  return merge(s1, s2);
 });
 
 gulp.task('watch', ['build'], () => {
